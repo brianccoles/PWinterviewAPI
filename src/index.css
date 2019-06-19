@@ -11,3 +11,19 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+.labelCell {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.dataCell {
+    font-size: 14px;
+}
+.editCell {
+     readonly : false;
+}
+
+.readOnlyCell {
+    font-size: 14px;
+}
