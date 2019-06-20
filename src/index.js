@@ -1,4 +1,5 @@
 import React from 'react';
+import os from 'os';
 import ReactDOM from 'react-dom';
 import './index.css';
 //  import App from './App';
@@ -67,6 +68,8 @@ class  RowHolder {
         this.prepareNewStateRowList = this.prepareNewStateRowList.bind(this);
         this.handleEditChange = this.handleEditChange.bind(this);
         this.isEditMode = true;
+        console.log("on >" + os.hostname() + "<");
+        this.ServerHost = (os.hostname() === "Brian-Coless-iMac.local" || os.hostname() === "localhost" )  ? "localhost:8081" : "34.204.52.29:8081";
 
     }
 
@@ -616,6 +619,7 @@ class  ItemEntry extends React.Component {
             <div key="8888" >
                 { this.renderList()  }
             </div>
+                <div>{this.ServerHost}</div>
             </form>
         );
     }
