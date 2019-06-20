@@ -1,5 +1,7 @@
 var express = require('express');
 var os = require('os');
+var multer = require('multer');
+var upload = multer({dest : "/Users/brian/Projects/colesb-project/public/images"});
 
 const EntryDatabase = require("./EntryDatabase.js");
 
@@ -23,6 +25,7 @@ var app = express();
 app.post('/create', function(req, res){
     //  do the insert for a new row and returning the ID.  Get the JSON for the row from the post parameter
     //  Add the current date and time.
+    console.log("in post create");
     let inData = "";
     req.on('data', chunk => {
         // console.log("chunk: " + chunk)
@@ -74,6 +77,7 @@ app.get('/delete', function(req,res) {
  * Post updates to an entry identified by the unique ID.
  */
 app.post('/update', function(req,res) {
+    console.log("in post updagte");
     let inData = "";
     req.on('data', chunk => {
         console.log("chunk: " + chunk)
@@ -96,11 +100,34 @@ app.post('/update', function(req,res) {
     });
 
 });
+// app.post('/profile', upload.single('avatar'), function (req, res, next) {
+//   // req.file is the `avatar` file
+//   // req.body will hold the text fields, if there were any
+// })
 
+app.post('/upload', upload.single("ImageFile"), function(req,res) {
+        console.log("in upload");
+        console.log(req)
+        var storage = multer.diskStorage({
+            destination: function (req, file, cb) {
+                cb(null, "/Users/brian/Projects/colesb-project/public/images");
+            },
+            filename: function (req, file, cb) {
+                cb(null, "SampleFile.jpg")
+            }
 
-app.post('/upload', function(req,res) {
+        });
+
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'text/plain');
+        res.setHeader('Access-Control-Allow-Origin', '*');
 
 });
+
+app.use(function (err, req, res, next) {
+    console.log('This is the invalid field ->', err.field)
+    next(err)
+})
 
 const http = require('http');
 

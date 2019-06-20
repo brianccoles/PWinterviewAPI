@@ -6,6 +6,9 @@ import './index.css';
 import * as serviceWorker from './serviceWorker';
 import axios from 'axios';
 
+
+const ServerHost =  (os.hostname() === "Brian-Coless-iMac.local" || os.hostname() === "localhost" )  ? "localhost:8081" : "34.204.52.29:8081";
+
 /**
  * Object for holding the code and meaning for Product categories.  The code is stored in the database
  * while the meaning is displayed to the user.
@@ -68,8 +71,8 @@ class  RowHolder {
         this.prepareNewStateRowList = this.prepareNewStateRowList.bind(this);
         this.handleEditChange = this.handleEditChange.bind(this);
         this.isEditMode = true;
-        console.log("on >" + os.hostname() + "<");
-        this.ServerHost = (os.hostname() === "Brian-Coless-iMac.local" || os.hostname() === "localhost" )  ? "localhost:8081" : "34.204.52.29:8081";
+        //  console.log("on >" + os.hostname() + "<");
+        //  this.ServerHost = (os.hostname() === "Brian-Coless-iMac.local" || os.hostname() === "localhost" )  ? "localhost:8081" : "34.204.52.29:8081";
 
     }
 
@@ -252,8 +255,32 @@ class  RowHolder {
 
     handleImageFile(event){
         //  User selected the uploaded file.  We need to preserve it in this object's holder.
-        this.ImageFile = event.target.files[0].name;
-        this.ImageData = btoa(event.target.file[0]);
+        // this.ImageFile = event.target.files[0].name;
+        // this.ImageData = btoa(event.target.file[0]);
+
+        // var axiosParms =
+        //     {
+        //         method : "POST",
+        //         url : "http://localhost:8081/upload",
+        //
+        //
+        //     } ;
+
+        const formData = new FormData();
+        formData.append('file', event.target.files[0], "ImageFile"  /*  event.target.files[0].name  */);
+        axios.post('http://'+ServerHost+'/upload', event.target.files[0],
+            {
+                headers: {"Content-Type" : "multipart/form-data"}
+            }
+        );
+        // axios.post("http://localhost:8081/upload", formData)
+        //     .then((response) => {
+        //         console.log(response);
+        //     })
+        //     .catch((error) => {
+        //         console.log(error);
+        //     })
+
 
     }
 
@@ -281,7 +308,7 @@ class  RowHolder {
         var axiosParms =
             {
                 method : "POST",
-                url : "http://localhost:8081/create",
+                url : "http://"+ServerHost+"/create",
                 data : dataToServer
 
             } ;
@@ -339,7 +366,7 @@ class  RowHolder {
         var axiosParms =
             {
                 method : "POST",
-                url : "http://localhost:8081/update",
+                url : "http://"+ServerHost+"/update",
                 data : dataToServer
 
             } ;
@@ -432,7 +459,7 @@ class  RowHolder {
         if (window.confirm("Are you sure you want to delete the " + this.ProductYear + " " + this.ProductMake + " " + this.ProductModel + "?")){
             axios({
                 method : "GET",
-                url: "http://localhost:8081/delete?Id=" + this.Id
+                url: "http://"+ServerHost+"/delete?Id=" + this.Id
 
             }).then(res=> {
                 //   Copy the existing state's RowData, but leave out the deleted entry.  This will
@@ -565,7 +592,7 @@ class  ItemEntry extends React.Component {
         //  Send the data to the server as a POST action.
         axios({
             method : 'GET',
-            url : "http://localhost:8081/read",
+            url : "http://"+ServerHost+"/read",
 
         }).then(res=> {
             // console.log("Reading list from...");
@@ -619,7 +646,7 @@ class  ItemEntry extends React.Component {
             <div key="8888" >
                 { this.renderList()  }
             </div>
-                <div>{this.ServerHost}</div>
+
             </form>
         );
     }
