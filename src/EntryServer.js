@@ -1,4 +1,6 @@
 var express = require('express');
+var os = require('os');
+
 const EntryDatabase = require("./EntryDatabase.js");
 
 
@@ -95,9 +97,14 @@ app.post('/update', function(req,res) {
 
 });
 
+
+app.post('/upload', function(req,res) {
+
+});
+
 const http = require('http');
 
-const hostname = '127.0.0.1';
+const hostname = (os.hostname() === "Brian-Coless-iMac.local" || os.hostname() === "localhost" )  ? "127.0.0.1" : "34.204.52.29"; //  '127.0.0.1';
 const port = 8081;
 
 
