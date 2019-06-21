@@ -21,17 +21,17 @@ class EntryDatabase {
     +--------------------+---------------------+------+-----+---------+----------------+
      */
     constructor() {
-        if ((os.hostname() === "Brian-Coless-iMac.local" || os.hostname() === "localhost" ))
-        {
-            this.con = mysql.createConnection({
-                host: "bcpractice.ce6wunnrmla1.us-east-2.rds.amazonaws.com",
-                user: "Brian",
-                password: "7C5o5ChXpt",
-                database: "Laravel",
-                port: 3306
-            });
-        }
-        else
+        // if ((os.hostname() === "Brian-Coless-iMac.local" || os.hostname() === "localhost" ))
+        // {
+        //     this.con = mysql.createConnection({
+        //         host: "bcpractice.ce6wunnrmla1.us-east-2.rds.amazonaws.com",
+        //         user: "Brian",
+        //         password: "7C5o5ChXpt",
+        //         database: "Laravel",
+        //         port: 3306
+        //     });
+        // }
+        // else
         {
             this.con = mysql.createConnection({
                 host: "34.204.52.29",
