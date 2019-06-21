@@ -51,6 +51,9 @@ class  RowHolder {
         this.ProductYear = ""; //  Site truck 1967, #60,  Refer truck 1968
         this.ProductDescription = "";
         this.ImageFile = "NextProductPlaceHolder.jpg";
+        this.TempImageFile = null;
+        this.DisplayedFileName = "/images/" + (this.TempImageFile !== null ? this.TempImageFile : this.ImageFile);
+        this.OldFileName = null;
 
         // this.FieldAgent = "me";   // <<  in production, would initialize this to logged in user
         // this.ProductCategory = 0;  //  Unknown category
@@ -70,10 +73,36 @@ class  RowHolder {
         this.handleUpdate = this.handleUpdate.bind(this);
         this.prepareNewStateRowList = this.prepareNewStateRowList.bind(this);
         this.handleEditChange = this.handleEditChange.bind(this);
+        this.handleNewEntryClear = this.handleNewEntryClear.bind(this);
         this.isEditMode = true;
         //  console.log("on >" + os.hostname() + "<");
         //  this.ServerHost = (os.hostname() === "Brian-Coless-iMac.local" || os.hostname() === "localhost" )  ? "localhost:8081" : "34.204.52.29:8081";
 
+    }
+
+    /**
+     * Make a shallow copy of the holder.  Used with React state so we can modify this one and sent up as a new
+     * set of state values.
+     * @returns {RowHolder}
+     */
+    cloneMe()
+    {
+        var rv = new RowHolder(this.Parent);
+
+        rv.Id = this.Id;
+        rv.Status = this.Status;
+        rv.FieldAgent = this.FieldAgent;   // <<  in production, would initialize this to logged in user
+        rv.ProductCategory = this.ProductCategory;  //  Unknown category
+        rv.ProductMake = this.ProductMake;
+        rv.ProductModel = this.ProductModel;
+        rv.ProductYear = this.ProductYear ; //  Site truck 1967, #60,  Refer truck 1968
+        rv.ProductDescription = this.ProductDescription ;
+        rv.ImageFile = this.ImageFile;
+        rv.TempImageFile = this.TempImageFile;
+        rv.DisplayedFileName = this.DisplayedFileName;
+        rv.OldFileName = this.OldFileName;
+        rv.isEditMode = this.isEditMode;
+        return rv;
     }
 
     /**
@@ -88,6 +117,15 @@ class  RowHolder {
             this[fieldList[i]] = dataSource[fieldList[i]];
         }
         this.isEditMode = false;
+        this.establishDisplayedName();
+    }
+
+    establishDisplayedName(){
+        if (this.TempImageFile !== null)
+            this.DisplayedFileName = "images/" +  this.TempImageFile;
+        else
+            this.DisplayedFileName = "images/" +  this.ImageFile;
+
     }
 
     //  The app is interested in rendering this row.  Use internal info to decide if
@@ -101,6 +139,7 @@ class  RowHolder {
 
     // List of  product categories and their corresponding codes.  Code is store in the database, but meaning
     // displayed on the web.
+    // >>>> FUTURE FEATURE read this list from entries in the database and allow the users to create new ones, in some managed way.
     static CategoryOptions = [
         new CategoryHolder(0,"Unknown"),
         new CategoryHolder(1, "General Truck"),
@@ -111,16 +150,14 @@ class  RowHolder {
         ];
 
     renderEditEntry(){
-        // alert("Entry data = " + JSON.stringify(this));
-        var imageFileName = "/images/" + this.ImageFile;
-        var thisIndex = this.Parent.state.RowData.indexOf(this);
-        console.log("this index = " + thisIndex);
+        //  Render our layout with empty fields (for a new entry) or filled-in fields to edit an existing product.  Reference the parent's state so the values
+        //  become controlled.
         return (
             <div key={"90"}>
 
-                <table  key={"100"} ><tbody>
-                    <tr key={"101"}>
-                        <td rowSpan="7" valign="top"><img src={imageFileName} height="200"  alt="Product Goes Here." /></td>
+                <table  key="100" ><tbody>
+                    <tr key="101">
+                        <td key="102" rowSpan="7" valign="top"><img key="103" src={this.Parent.state.EditRow.DisplayedFileName} height="200"  alt="Product Goes Here." /></td>
                         <td></td>
                         <td></td>
                     </tr>
@@ -128,21 +165,21 @@ class  RowHolder {
                         <td align="right"><span className="labelCell">Field Agent: </span></td><td><input key="115" type="text" name="FieldAgent" className="editCell"  size="32" value={this.FieldAgent}  onChange={this.handleEditChange}/></td>
                     </tr>
                     <tr key="120">
-                        <td align="right"><span className="labelCell">Category: </span></td><td><select  key="125"  name="ProductCategory" value={this.ProductCategory}  onChange={this.handleEditChange}>
+                        <td align="right"><span className="labelCell">Category: </span></td><td><select  key="125"  name="ProductCategory" value={this.Parent.state.EditRow.ProductCategory}  onChange={this.handleEditChange}>
                         {RowHolder.CategoryOptions.map((catHolder) => { return catHolder.MakeSelectorOption()})}
 
                     </select></td>
 
                     </tr>
                     <tr key="130">
-                        <td align="right"><span className="labelCell">Make: </span></td><td><input  key="135" type="text" name="ProductMake"  className="editCell"  size="32" value={this.ProductMake}  onChange={this.handleEditChange}/></td>
+                        <td align="right"><span className="labelCell">Make: </span></td><td><input  key="135" type="text" name="ProductMake"  className="editCell"  size="32" value={this.Parent.state.EditRow.ProductMake}  onChange={this.handleEditChange}/></td>
 
                     </tr>
                     <tr key="140">
-                        <td align="right"><span className="labelCell">Model: </span></td><td><input  key="145"  type="text" name="ProductModel" className="editCell"   size="32" value={this.ProductModel}  onChange={this.handleEditChange}/></td>
+                        <td align="right"><span className="labelCell">Model: </span></td><td><input  key="145"  type="text" name="ProductModel" className="editCell"   size="32" value={this.Parent.state.EditRow.ProductModel}  onChange={this.handleEditChange}/></td>
                     </tr>
                     <tr key="150">
-                        <td align="right"><span className="labelCell">Year: </span></td><td><input  key="155" type="text" name="ProductYear"  className="editCell"  size="4" value={this.ProductYear}  onChange={this.handleEditChange}/></td>
+                        <td align="right"><span className="labelCell">Year: </span></td><td><input  key="155" type="text" name="ProductYear"  className="editCell"  size="4" value={this.Parent.state.EditRow.ProductYear}  onChange={this.handleEditChange}/></td>
                     </tr>
                     <tr key="160">
                         <td align="right" valign="top"><span className="labelCell">Description: </span></td><td  width="300px">
@@ -173,8 +210,15 @@ class  RowHolder {
     makeEditButtonRow() {
         //  If the Id is -1, then we have a new entry, so the only button we need is a Save.  Otherwise we need
         //  an Update and a Cancel button for entries being editted or Edit and Delete buttons for read-only entries.
+        //  handleNewEntryClear
         if (this.Id === -1)
-            return (<button className="button" onClick={this.handleSubmit}>Save</button>);
+            if (this.isEditMode)
+                return (<div><button className="button" onClick={this.handleSubmit}>Save</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button className="button" onClick={this.handleNewEntryClear}>Clear</button></div>);
+            else
+            {
+                //  if the first row isn't in edit mode for a new entry, then there are no buttons needed.
+                return (<span></span>);
+            }
         else
         {
             if (this.isEditMode)
@@ -186,13 +230,12 @@ class  RowHolder {
     }
 
     renderReadOnlyEntry(){
-        var imageFileName = "/images/" + this.ImageFile;
         return (
             <div  key={"200"+this.Id}>
 
                 <table><tbody>
                     <tr>
-                        <td rowSpan="7" valign="top" ><img src={imageFileName} height="200"  alt="snowplow" /></td>
+                        <td rowSpan="7" valign="top" ><img src={this.DisplayedFileName} height="200"  alt="Product Goes Here" /></td>
                         <td></td>
                         <td></td>
                     </tr>
@@ -253,33 +296,41 @@ class  RowHolder {
 
     }
 
+    //  -------------------  Event Handlers ------------------------
+
     handleImageFile(event){
         //  User selected the uploaded file.  We need to preserve it in this object's holder.
-        // this.ImageFile = event.target.files[0].name;
-        // this.ImageData = btoa(event.target.file[0]);
-
-        // var axiosParms =
-        //     {
-        //         method : "POST",
-        //         url : "http://localhost:8081/upload",
-        //
-        //
-        //     } ;
+        var preservedFileName = event.target.files[0].name;
 
         const formData = new FormData();
-        formData.append('file', event.target.files[0], "ImageFile"  /*  event.target.files[0].name  */);
-        axios.post('http://'+ServerHost+'/upload', event.target.files[0],
-            {
-                headers: {"Content-Type" : "multipart/form-data"}
-            }
-        );
-        // axios.post("http://localhost:8081/upload", formData)
-        //     .then((response) => {
-        //         console.log(response);
-        //     })
-        //     .catch((error) => {
-        //         console.log(error);
-        //     })
+        formData.append('file', event.target.files[0] );     //   /*  event.target.files[0].name  */
+        const config = { headers: {"Content-Type" : "multipart/form-data"} };
+        var outerThisProxy = this;
+        axios.post('http://'+ServerHost+'/upload', formData, config )
+            .then((response) => {
+                //  console.log(response);
+                outerThisProxy.prepareNewStateRowList(function(whichRow) {
+                    if (whichRow.Id === outerThisProxy.Id)
+                    {
+                        whichRow = whichRow.cloneMe();
+
+                        whichRow.ImageFile = preservedFileName;  //  name of the file the user selected
+                        whichRow.TempImageFile = response['data'];        //  name of the file on the server for this uploaded image.
+                        whichRow.establishDisplayedName();
+                        //  By updating the edit row, we force react to refresh the picture and pick up the new one.
+                        //  outerThisProxy.Parent.setState({EditRow : whichRow});
+                        console.log("new image in this row");
+                        console.log(outerThisProxy);
+                    }
+                    return whichRow;
+
+                })
+
+
+            })
+            .catch((error) => {
+                console.log(error);
+            })
 
 
     }
@@ -287,7 +338,11 @@ class  RowHolder {
     handleEditChange(event) {
         //  console.log(event.target.name + " is changing to " + event.target.value);
         this[event.target.name] = event.target.value;
-        this.Parent.setState({EditRow : this});
+        var editRowHolder = this.cloneMe();
+        //  Preserve the display file name so we can restore it in the event of a cancel.
+        editRowHolder.OldFileName = editRowHolder.DisplayedFileName;
+        editRowHolder.isEditMode = true;
+        this.Parent.setState({EditRow : editRowHolder});
 
     }
 
@@ -296,6 +351,20 @@ class  RowHolder {
      */
     handleSubmit()
     {
+        //  Establish the temp name for the image as the final name, but only if the user uploaded an image.
+        //  FUTURE FEATURE We need to managed these better, with a system for clearing out uploaded, but unused
+        //  images from the directory.
+        if (this.TempImageFile !== null)
+            this.ImageFile = this.TempImageFile;
+        else
+        {
+            //  Don't have a temp image file, so didn't upload a picture.  Store the placeholder for an empty
+            //  image.
+            this.ImageFile = "MissingProductPlaceHolder.jpg";
+            this.establishDisplayedName();
+        }
+
+
         //  We get a circular reference when we try to stringify the object, so we temporarily whipe out
         //  the parent reference before the stringify and then restore it.
         var tempParent = this.Parent;
@@ -313,7 +382,6 @@ class  RowHolder {
 
             } ;
 
-        var thisProxy = this;
         //  Send the data to the server as a POST action.
         axios(axiosParms).then(res=> {
             //  should be returning the unique id for this entry.
@@ -323,9 +391,9 @@ class  RowHolder {
                 if (whichRow.Id === -1)
                 {
                     //  We may have to clone the object.  We'll see if this works first
-                    thisProxy.Parent.setState({
-                        EditRow : whichRow
-                    });
+                    // thisProxy.Parent.setState({
+                    //     EditRow : whichRow
+                    // });
                     whichRow.isEditMode = true;
                     return whichRow;
                 }
@@ -353,12 +421,18 @@ class  RowHolder {
      */
     handleUpdate()
     {
+        //  If the update includes a new image, then use the TempImageFile as the permanent one.
+        //  If not, then we just let the existing image ride.
+        if (this.TempImageFile !== null)
+            this.ImageFile = this.TempImageFile;
+
+
         //  We get a circular reference when we try to stringify the object, so we temporarily whipe out
         //  the parent reference before the stringify and then restore it.
         var tempParent = this.Parent;
         this.Parent = null;
         var dataToServer = JSON.stringify(this);
-        console.log("collected data for update:  " + dataToServer);
+        //  console.log("collected data for update:  " + dataToServer);
         this.Parent = tempParent;
 
         //  Adjust the parameters for the axios call to reflect a create (for a new entry) or
@@ -403,24 +477,28 @@ class  RowHolder {
      */
     handleCancel()
     {
-        var thisProxy = this;
         this.prepareNewStateRowList(function(whichRow) {
-            if (whichRow.Id === -1)
-            {
-                //  We may have to clone the object.  We'll see if this works first
-                thisProxy.Parent.setState({
-                    EditRow : whichRow
-                });
-                whichRow.isEditMode = true;
-                return whichRow;
-            }
-            else {
-                whichRow.isEditMode = false;
-                return whichRow;
-            }
+
+            whichRow.isEditMode = (whichRow.Id === -1);
+
+            //  Restore the preserved file name as current one.
+            whichRow.DisplayedFileName = whichRow.OldFileName;
+            whichRow.OldFileName = null;
+            return whichRow;
         });
 
 
+    }
+
+    handleNewEntryClear()
+    {
+        var thisProxy = this;
+        this.prepareNewStateRowList(function(whichRow) {
+            //   The contructor for a new row establish the values for a pristine
+            //   edit.
+            whichRow = new RowHolder(thisProxy.Parent);
+            return whichRow;
+        });
     }
 
     /**
@@ -430,21 +508,12 @@ class  RowHolder {
     handleEdit()
     {
         var testId = this.Id;
-        var thisProxy = this;
+        console.log(this);
         this.prepareNewStateRowList(function(whichRow) {
-                if (whichRow.Id === testId)
-                {
-                    //  We may have to clone the object.  We'll see if this works first
-                    thisProxy.Parent.setState({
-                        EditRow : whichRow
-                    });
-                    whichRow.isEditMode = true;
-                    return whichRow;
-                }
-                else {
-                    whichRow.isEditMode = false;
-                    return whichRow;
-                }
+
+                whichRow.isEditMode = (whichRow.Id === testId);
+                whichRow.OldFileName = whichRow.DisplayedFileName;
+                return whichRow;
             });
 
 
@@ -466,6 +535,7 @@ class  RowHolder {
                 //   be faster than rereading the database.
                 var testID = this.Id;
                 this.prepareNewStateRowList(function(whichRow) {
+                    console.log("comparing " + whichRow.Id + " = " + testID + "?");
                     if (whichRow.Id === testID)
                         return null;
                     else
@@ -546,17 +616,27 @@ class  RowHolder {
      */
     prepareNewStateRowList(callback, addNew = false)
     {
+
         var newItemList = [];
         if (addNew)
             newItemList.push(new RowHolder(this.Parent));
+        var editRow = null;
         for (var i = 0; i < this.Parent.state.RowData.length; i++)
         {
             var rowHolder = callback(this.Parent.state.RowData[i]);
             if  (rowHolder !== null)
+            {
                 newItemList.push(rowHolder);
-        }
+                if (rowHolder.isEditMode)
+                    editRow = rowHolder
+            }
 
-        this.Parent.setState({RowData : newItemList});
+        }
+        var newState = {RowData : newItemList};
+        if (editRow != null)
+            newState.EditRow = editRow;
+        this.Parent.setState(newState);
+
 
 
     }
@@ -642,10 +722,14 @@ class  ItemEntry extends React.Component {
         // console.log("Preparing to render...");å
         // console.log(this.state.RowData);
         return (
+
             <form key="7777"  >
-            <div key="8888" >
-                { this.renderList()  }
-            </div>
+                <img key="103" src="images/LavendarWaveLogo.jpg"  alt="Logo" />
+                <hr />
+
+                <div key="8888" >
+                    { this.renderList()  }
+                 </div>
 
             </form>
         );

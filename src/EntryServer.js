@@ -1,5 +1,6 @@
 var express = require('express');
 var os = require('os');
+var fs = require('fs');
 var multer = require('multer');
 var upload = multer({dest : "/Users/brian/Projects/colesb-project/public/images"});
 
@@ -105,15 +106,15 @@ app.post('/update', function(req,res) {
 //   // req.body will hold the text fields, if there were any
 // })
 
-app.post('/upload', upload.single("ImageFile"), function(req,res) {
+app.post('/upload', upload.single("file"), function(req,res) {
         console.log("in upload");
-        console.log(req)
+        console.log(req.file);
         var storage = multer.diskStorage({
             destination: function (req, file, cb) {
                 cb(null, "/Users/brian/Projects/colesb-project/public/images");
             },
             filename: function (req, file, cb) {
-                cb(null, "SampleFile.jpg")
+                cb(null, "SampleFile.jpg");   // <<<  not sure how this is ever used.  This file name never shows up.
             }
 
         });
@@ -121,6 +122,16 @@ app.post('/upload', upload.single("ImageFile"), function(req,res) {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'text/plain');
         res.setHeader('Access-Control-Allow-Origin', '*');
+
+        //  Rename the file so the name includes the original name.  If we have to trace things down
+        //  we have a better reference than the temp name created by multer.  This also
+        //  adds the extension to identify the type of file.
+        var newFile = req.file.filename + "_" + req.file.originalname;
+        var newFilePath = req.file.destination + "/" + newFile;
+        console.log("New file path is " + newFilePath);
+        fs.renameSync(req.file.path, newFilePath);
+        //  res.end(req.file.filename);
+        res.end(newFile);
 
 });
 
