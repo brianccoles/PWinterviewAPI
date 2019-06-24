@@ -12,7 +12,7 @@ class EntryDatabase {
     | FieldAgent         | char(32)            | YES  |     | NULL    |                |
     | ProductCategory    | smallint(6)         | YES  |     | NULL    |                |
     | ProductMake        | char(32)            | YES  |     | NULL    |                |
-    | ProductModel       | char(16)            | YES  |     | NULL    |                |
+    | ProductModel       | char(32)            | YES  |     | NULL    |                |
     | ProductYear        | smallint(6)         | YES  |     | NULL    |                |
     | ProductDescription | varchar(255)        | YES  |     | NULL    |                |
     | Status             | char(1)             | YES  |     | NULL    |                |
@@ -26,7 +26,7 @@ class EntryDatabase {
         //     this.con = mysql.createConnection({
         //         host: "bcpractice.ce6wunnrmla1.us-east-2.rds.amazonaws.com",
         //         user: "Brian",
-        //         password: "7C5o5ChXpt",
+        //         password: "",
         //         database: "Laravel",
         //         port: 3306
         //     });
