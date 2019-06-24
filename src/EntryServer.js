@@ -2,8 +2,8 @@ var express = require('express');
 var os = require('os');
 var fs = require('fs');
 var multer = require('multer');
-var upload = multer({dest : "/Users/brian/Projects/colesb-project/public/images"});
-
+var isDevelopment = (os.hostname() === "Brian-Coless-iMac.local" || os.hostname() === "localhost" );
+var upload = multer({dest :( isDevelopment? "/Users/brian/Projects/colesb-project/public/images" : "/home/colesb/colesb-project/public/images")});
 const EntryDatabase = require("./EntryDatabase.js");
 
 
@@ -142,7 +142,7 @@ app.use(function (err, req, res, next) {
 
 const http = require('http');
 
-const hostname = (os.hostname() === "Brian-Coless-iMac.local" || os.hostname() === "localhost" )  ? "127.0.0.1" : "34.204.52.29"; //  '127.0.0.1';
+const hostname = isDevelopment ? "127.0.0.1" : "34.204.52.29"; //  '127.0.0.1';
 const port = 8081;
 
 
