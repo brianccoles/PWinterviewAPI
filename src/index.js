@@ -419,9 +419,8 @@ class  RowHolder {
      */
     handleUpdate()
     {
-        if (this.proofData() === false)
+        if (!this.proofData())
             return;
-
         //  If the update includes a new image, then use the TempImageFile as the permanent one.
         //  If not, then we just let the existing image ride.
         if (this.TempImageFile !== null)
@@ -672,7 +671,7 @@ class  RowHolder {
             alert("Please enter a value for the required Model field");
             return false;
         }
-        if (this.ProductYear.length === 0  || !Number.isInteger(this.ProductYear))
+        if (this.ProductYear.length === 0  ||  isNaN(parseInt(this.ProductYear)))
         {
             alert("Please enter a valid integer value for the required Year field");
             return false;
