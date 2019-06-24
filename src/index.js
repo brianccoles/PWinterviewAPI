@@ -672,7 +672,7 @@ class  RowHolder {
             alert("Please enter a value for the required Model field");
             return false;
         }
-        if (this.ProductYear.length === 0  || !Number.isInteger(this.Product))
+        if (this.ProductYear.length === 0  || Number.isInteger(this.ProductYear))
         {
             alert("Please enter a valid integer value for the required Year field");
             return false;
