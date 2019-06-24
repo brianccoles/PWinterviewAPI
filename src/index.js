@@ -1,5 +1,4 @@
 import React from 'react';
-import os from 'os';
 import ReactDOM from 'react-dom';
 import './index.css';
 //  import App from './App';
@@ -7,7 +6,8 @@ import * as serviceWorker from './serviceWorker';
 import axios from 'axios';
 
 
-const ServerHost =  (os.hostname() === "ip-172-30-0-115" ? "34.204.52.29:8081" : "localhost:8081") ;
+import os from 'os';
+const ServerHost =  os.hostname()  + ":8081"; //  "localhost:8081"; //  "34.204.52.29:8081"; //  (os.hostname() === "ip-172-30-0-115" ? "34.204.52.29:8081" : "localhost:8081") ;
 
 /**
  * Object for holding the code and meaning for Product categories.  The code is stored in the database
@@ -43,8 +43,8 @@ class  RowHolder {
         this.Id = -1;
         this.Status = "N";  //  For a new entry
 
-
-        this.FieldAgent = "";   // <<  in production, would initialize this to logged in user
+        //  Establish the default values for a new entry.
+        this.FieldAgent = "";   // <<   FUTURE FEATURE:   in production, would initialize this to logged in user
         this.ProductCategory = 0;  //  Unknown category
         this.ProductMake = "";
         this.ProductModel= "";
@@ -55,14 +55,8 @@ class  RowHolder {
         this.DisplayedFileName = "/images/" + (this.TempImageFile !== null ? this.TempImageFile : this.ImageFile);
         this.OldFileName = null;
 
-        // this.FieldAgent = "me";   // <<  in production, would initialize this to logged in user
-        // this.ProductCategory = 0;  //  Unknown category
-        // this.ProductMake = "Matchbox";
-        // this.ProductModel= "Site truck #60";
-        // this.ProductYear = "1967"; //  Site truck 1967, #60,  Refer truck 1968
-        // this.ProductDescription = "Cabin transport truck.  Cabin included!"; //   "Refrigeration truck with back door that really opens and closes!  (Refrigeration unit not included.)";
-        // this.ImageFile = "IMG_1209.jpg";
-
+        //  Latch the parent.  When working with a row, we can find the enclosing class to set it's state and affect
+        //  change via React's framework.
         this.Parent = whichParent;
 
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -152,6 +146,8 @@ class  RowHolder {
     renderEditEntry(){
         //  Render our layout with empty fields (for a new entry) or filled-in fields to edit an existing product.  Reference the parent's state so the values
         //  become controlled.
+        //  FUTURE FEATURE:  grey out the labels of the
+        var labelClass = this.Id === -1 && !this.isEditMode ? "greyLabelCell" : "labelCell";
         return (
             <div key={"90"}>
 
@@ -162,28 +158,28 @@ class  RowHolder {
                         <td></td>
                     </tr>
                     <tr key="110">
-                        <td align="right"><span className="labelCell">Field Agent: </span></td><td><input key="115" type="text" name="FieldAgent" className="editCell"  size="32" value={this.FieldAgent}  onChange={this.handleEditChange}/></td>
+                        <td align="right"><span className={labelClass}>Field Agent: </span></td><td><input key="115" type="text"  name="FieldAgent" className="editCell"  size="32" value={this.FieldAgent}  onChange={this.handleEditChange}/></td>
                     </tr>
                     <tr key="120">
-                        <td align="right"><span className="labelCell">Category: </span></td><td><select  key="125"  name="ProductCategory" value={this.Parent.state.EditRow.ProductCategory}  onChange={this.handleEditChange}>
+                        <td align="right"><span className={labelClass}>Category: </span></td><td><select  key="125"  name="ProductCategory" value={this.Parent.state.EditRow.ProductCategory}  onChange={this.handleEditChange}>
                         {RowHolder.CategoryOptions.map((catHolder) => { return catHolder.MakeSelectorOption()})}
 
                     </select></td>
 
                     </tr>
                     <tr key="130">
-                        <td align="right"><span className="labelCell">Make: </span></td><td><input  key="135" type="text" name="ProductMake"  className="editCell"  size="32" value={this.Parent.state.EditRow.ProductMake}  onChange={this.handleEditChange}/></td>
+                        <td align="right"><span className={labelClass}>Make: </span></td><td><input  key="135" type="text"   name="ProductMake"  className="editCell"  size="32" value={this.Parent.state.EditRow.ProductMake}  onChange={this.handleEditChange}/></td>
 
                     </tr>
                     <tr key="140">
-                        <td align="right"><span className="labelCell">Model: </span></td><td><input  key="145"  type="text" name="ProductModel" className="editCell"   size="32" value={this.Parent.state.EditRow.ProductModel}  onChange={this.handleEditChange}/></td>
+                        <td align="right"><span className={labelClass}>Model: </span></td><td><input  key="145"  type="text"   name="ProductModel" className="editCell"   size="32" value={this.Parent.state.EditRow.ProductModel}  onChange={this.handleEditChange}/></td>
                     </tr>
                     <tr key="150">
-                        <td align="right"><span className="labelCell">Year: </span></td><td><input  key="155" type="text" name="ProductYear"  className="editCell"  size="4" value={this.Parent.state.EditRow.ProductYear}  onChange={this.handleEditChange}/></td>
+                        <td align="right"><span className={labelClass}>Year: </span></td><td><input  key="155" type="text"   name="ProductYear"  className="editCell"  size="4" value={this.Parent.state.EditRow.ProductYear}  onChange={this.handleEditChange}/></td>
                     </tr>
                     <tr key="160">
-                        <td align="right" valign="top"><span className="labelCell">Description: </span></td><td  width="300px">
-                            <textarea  key="165"  name="ProductDescription" className="editCell"  rows="4" cols="64" value={this.Parent.state.EditRow.ProductDescription} onChange={this.handleEditChange}></textarea>
+                        <td align="right" valign="top"><span className={labelClass}>Description: </span></td><td  width="300px">
+                            <textarea  key="165"  name="ProductDescription"   className="editCell"  rows="4" cols="64" value={this.Parent.state.EditRow.ProductDescription} onChange={this.handleEditChange}></textarea>
                         </td>
                     </tr>
 
@@ -308,7 +304,6 @@ class  RowHolder {
         var outerThisProxy = this;
         axios.post('http://'+ServerHost+'/upload', formData, config )
             .then((response) => {
-                //  console.log(response);
                 outerThisProxy.prepareNewStateRowList(function(whichRow) {
                     if (whichRow.Id === outerThisProxy.Id)
                     {
@@ -335,8 +330,9 @@ class  RowHolder {
 
     }
 
+    //  The event handler tied to the input fields.  Since the name of the control exactly matches the
+    //  name of the field in the structure, we can easily use the name to set the right row holder's value.
     handleEditChange(event) {
-        //  console.log(event.target.name + " is changing to " + event.target.value);
         this[event.target.name] = event.target.value;
         var editRowHolder = this.cloneMe();
         //  Preserve the display file name so we can restore it in the event of a cancel.
@@ -351,6 +347,10 @@ class  RowHolder {
      */
     handleSubmit()
     {
+        //  If there are any bad values, bail.
+        if (this.proofData() === false)
+            return;
+
         //  Establish the temp name for the image as the final name, but only if the user uploaded an image.
         //  FUTURE FEATURE We need to managed these better, with a system for clearing out uploaded, but unused
         //  images from the directory.
@@ -386,7 +386,6 @@ class  RowHolder {
         axios(axiosParms).then(res=> {
             //  should be returning the unique id for this entry.
             this.Id = res['data']; // the id of the new entry.
-
             this.prepareNewStateRowList(function(whichRow) {
                 if (whichRow.Id === -1)
                 {
@@ -401,13 +400,12 @@ class  RowHolder {
                     whichRow.isEditMode = false;
                     return whichRow;
                 }
-            }, true /* add new at beginning */);
+            }, true /* add new at beginning */)
+                .catch(error => {
+                    alert("Trouble saving new entry: " + error);
 
-            // const  imageToSave = new FormData();
-            // imageToSave.append(
-            //     'myFile',
-            //
-            // )
+                });
+
 
 
         });
@@ -421,6 +419,9 @@ class  RowHolder {
      */
     handleUpdate()
     {
+        if (this.proofData() === false)
+            return;
+
         //  If the update includes a new image, then use the TempImageFile as the permanent one.
         //  If not, then we just let the existing image ride.
         if (this.TempImageFile !== null)
@@ -467,7 +468,11 @@ class  RowHolder {
                 }
             });
 
-        });
+        })
+            .catch(error => {
+                alert("Trouble updating entry: " + error);
+
+            });
 
 
     }
@@ -547,7 +552,11 @@ class  RowHolder {
 
 
 
-            });
+            })
+                .catch(error => {
+                    alert("Trouble deleting entry: " + error);
+
+                });
 
             //  TRIED VALIANTLY to use the axios.delete, but even after trying solutions found on the web, nothing worked, so
             //  used the GET method as shown above.
@@ -640,9 +649,44 @@ class  RowHolder {
 
 
     }
+
+    /**  Proof the data for a new entry or a modified one.  Do it here for finner control over the proofing
+     * and when it is done.
+     * @returns {boolean}  True if all the values pass inspection; false if not.
+     */
+    proofData()
+    {
+
+        if (this.FieldAgent.length === 0)
+        {
+            alert("Please enter a value for the required Agent field");
+            return false;
+        }
+        if (this.ProductMake.length === 0)
+        {
+            alert("Please enter a value for the required Make field");
+            return false;
+        }
+        if (this.ProductModel.length === 0)
+        {
+            alert("Please enter a value for the required Model field");
+            return false;
+        }
+        if (this.ProductYear.length === 0  || !Number.isInteger(this.Product))
+        {
+            alert("Please enter a valid integer value for the required Year field");
+            return false;
+        }
+        if (this.ProductDescription.length === 0)
+        {
+            alert("Please enter a value for the required Desription field");
+            return false;
+        }
+        //  alert ("entry passed inspection");
+        return true;
+    }
 }
 
-// -------------------------------------------
 
 
 
@@ -691,7 +735,11 @@ class  ItemEntry extends React.Component {
                 RowData : newItemList,
                 EditRow : newItemList[0]
             });
-        });
+        })
+            .catch(error => {
+                alert("Trouble fetch list of products: " + error);
+
+            });
 
 
 
@@ -708,11 +756,6 @@ class  ItemEntry extends React.Component {
         }));
     }
 
-    // handleChange(event)
-    // {
-    //
-    //     this.setState({SampleText: event.target.value});
-    // }
 
     /**
      * The proverbial render method.  This is the one that gets the whole thing going!
@@ -724,6 +767,7 @@ class  ItemEntry extends React.Component {
         return (
 
             <form key="7777"  >
+
                 <img key="103" src="images/LavendarWaveLogo.jpg"  alt="Logo" />
                 <hr />
 

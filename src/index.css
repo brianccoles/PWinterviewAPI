@@ -17,6 +17,12 @@ code {
     font-weight: bold;
 }
 
+.greyLabelCell {
+    font-size: 14px;
+    font-weight: bold;
+    color : grey;
+}
+
 .dataCell {
     font-size: 14px;
 }

@@ -26,7 +26,7 @@ var app = express();
 app.post('/create', function(req, res){
     //  do the insert for a new row and returning the ID.  Get the JSON for the row from the post parameter
     //  Add the current date and time.
-    console.log("in post create");
+    //   console.log("in post create");
     let inData = "";
     req.on('data', chunk => {
         // console.log("chunk: " + chunk)
@@ -78,7 +78,7 @@ app.get('/delete', function(req,res) {
  * Post updates to an entry identified by the unique ID.
  */
 app.post('/update', function(req,res) {
-    console.log("in post updagte");
+    //  console.log("in post update");
     let inData = "";
     req.on('data', chunk => {
         console.log("chunk: " + chunk)
@@ -107,8 +107,8 @@ app.post('/update', function(req,res) {
 // })
 
 app.post('/upload', upload.single("file"), function(req,res) {
-        console.log("in upload");
-        console.log(req.file);
+        //  console.log("in upload");
+        //  console.log(req.file);
         var storage = multer.diskStorage({
             destination: function (req, file, cb) {
                 cb(null, "/Users/brian/Projects/colesb-project/public/images");
@@ -135,10 +135,10 @@ app.post('/upload', upload.single("file"), function(req,res) {
 
 });
 
-app.use(function (err, req, res, next) {
-    console.log('This is the invalid field ->', err.field)
-    next(err)
-})
+// app.use(function (err, req, res, next) {
+//     console.log('This is the invalid field ->', err.field)
+//     next(err)
+// })
 
 const http = require('http');
 
@@ -146,7 +146,7 @@ const hostname = isDevelopment ? "127.0.0.1" : "34.204.52.29"; //  '127.0.0.1';
 const port = 8081;
 
 
-app.listen(port, hostname, () => {
+app.listen(port, () => {
     console.log(`Server running at http://${hostname}:${port}/`);
 });
 
