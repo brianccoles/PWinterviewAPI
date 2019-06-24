@@ -7,7 +7,7 @@ import * as serviceWorker from './serviceWorker';
 import axios from 'axios';
 
 
-const ServerHost =  (os.hostname() === "Brian-Coless-iMac.local" || os.hostname() === "localhost" )  ? "localhost:8081" : "34.204.52.29:8081";
+const ServerHost =  (os.hostname() === "ip-172-30-0-115" ? "34.204.52.29:8081" : "localhost:8081" : ;
 
 /**
  * Object for holding the code and meaning for Product categories.  The code is stored in the database
